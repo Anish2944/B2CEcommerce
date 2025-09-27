@@ -1,0 +1,27 @@
+﻿@model B2CEcommerceApp.Models.Order
+
+<h2>Order Details</h2>
+<p><strong>Order Date:</strong> @Model.OrderDate</p>
+<p><strong>Total:</strong> @Model.TotalAmount</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderItems)
+        {
+            <tr>
+                <td>@(item.Product?.Name ?? "N/A")</td>
+                <td>@item.UnitPrice</td>
+                <td>@item.Quantity</td>
+                <td>@(item.UnitPrice * item.Quantity)</td>
+            </tr>
+        }
+    </tbody>
+</table>

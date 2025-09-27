@@ -1,0 +1,10 @@
+﻿@* @{
+    var count = (int)ViewBag.Count;
+}
+
+<a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">
+    Cart (@count)
+</a> *@
+<a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">
+    Cart (@((int)ViewBag.Count))
+</a>

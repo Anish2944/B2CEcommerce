@@ -1,0 +1,28 @@
+﻿@model B2CEcommerceApp.Models.Order
+
+<h2>Order Confirmation</h2>
+<p>Thank you for your order!</p>
+
+<p><strong>Order ID:</strong> @Model.Id</p>
+<p><strong>Date:</strong> @Model.OrderDate</p>
+<p><strong>Payment Method:</strong> @Model.PaymentMethod</p>
+<p><strong>Status:</strong> @Model.Status</p>
+
+<h3>Items:</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.OrderItems)
+        {
+            <tr>
+                <td>@item.Product.Name</td>
+                <td>@item.Quantity</td>
+            </tr>
+        }
+    </tbody>
+</table>
