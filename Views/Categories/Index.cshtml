@@ -1,35 +1,61 @@
-﻿@model IEnumerable<B2CEcommerceApp.Models.Category>
+@model IEnumerable<B2CEcommerceApp.Models.Category>
+@using System.Linq
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Categories";
+    var categories = Model ?? Enumerable.Empty<B2CEcommerceApp.Models.Category>();
 }
 
-<h1>Index</h1>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-5">
+            <div>
+                <span class="hero-badge">Admin · Catalog</span>
+                <h1 class="section-title mt-3 mb-2">Category manager</h1>
+                <p class="text-secondary mb-0">Organise your catalogue, group products, and keep the storefront structured.</p>
+            </div>
+            <a asp-action="Create" class="btn btn-primary btn-lg">Add new category</a>
+        </div>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+        @if (!categories.Any())
+        {
+            <div class="empty-state">
+                <h3 class="fw-semibold mb-2">No categories found</h3>
+                <p class="text-secondary mb-4">Create your first category to start organising the product range.</p>
+                <a asp-action="Create" class="btn btn-primary">Create category</a>
+            </div>
+        }
+        else
+        {
+            <div class="card card-lift">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-modern align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Category name</th>
+                                    <th scope="col" class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in categories)
+                                {
+                                    <tr>
+                                        <td class="fw-semibold">@item.Name</td>
+                                        <td class="text-end">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-primary">Preview</a>
+                                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                                <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

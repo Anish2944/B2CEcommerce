@@ -1,63 +1,102 @@
-﻿@model B2CEcommerceApp.Models.Product
+@model B2CEcommerceApp.Models.Product
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = $"{Model.Name} details";
+    var isAdmin = User.IsInRole("Admin");
+    var imageUrl = string.IsNullOrWhiteSpace(Model.ImageUrl)
+        ? "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80"
+        : Model.ImageUrl;
+    var categoryName = string.IsNullOrWhiteSpace(Model.Category?.Name) ? "General" : Model.Category!.Name;
+    var stockAvailable = Model.Stock > 0;
+    var description = string.IsNullOrWhiteSpace(Model.Description)
+        ? "This product is awaiting a description. Update the listing to highlight key features and benefits."
+        : Model.Description;
 }
 
-<h1>Details</h1>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-left"></i> Back to products</a>
+            <span class="badge-soft">Product ID #@Model.Id</span>
+        </div>
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-6">
+                <div class="card card-lift overflow-hidden h-100">
+                    <div class="ratio ratio-4x3 bg-light">
+                        <img src="@imageUrl" alt="@Model.Name" class="object-fit-cover"
+                             onerror="this.src='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=900&q=80';" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card card-lift p-4 h-100 d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-start mb-3">
+                        <span class="badge-soft">@categoryName</span>
+                        <span class="badge-soft bg-white fw-semibold @(stockAvailable ? "text-success" : "text-danger")">
+                            <i class="bi @(stockAvailable ? "bi-check-circle" : "bi-exclamation-triangle") me-1"></i>
+                            @(stockAvailable ? "In stock" : "Out of stock")
+                        </span>
+                    </div>
+                    <h1 class="section-title mb-2">@Model.Name</h1>
+                    <p class="lead text-secondary mb-4">@description</p>
 
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">
-            Category
-        </dt>
-        <dd class="col-sm-10">
-            @Model.Category?.Name
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Stock)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Stock)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
-@if (!User.IsInRole("Admin"))
-{
-    <form asp-controller="Wishlist" asp-action="Add" method="post">
-        <input type="hidden" name="productId" value="@Model.Id" />
-        <button class="btn btn-warning">Add to Wishlist</button>
-    </form>
-}
+                    <div class="bg-light rounded-4 p-4 mb-4">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-sm-6">
+                                <span class="text-secondary text-uppercase small fw-semibold">Price</span>
+                                <div class="display-6 fw-bold text-primary">@Model.Price.ToString("C")</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-secondary text-uppercase small fw-semibold">Available units</span>
+                                <div class="fs-4 fw-semibold">@Model.Stock</div>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-secondary text-uppercase small fw-semibold">Category</span>
+                                <div class="fw-semibold">@categoryName</div>
+                            </div>
+                        </div>
+                    </div>
 
+                    <ul class="list-unstyled text-secondary small mb-4">
+                        <li class="d-flex align-items-start gap-2 mb-2">
+                            <i class="bi bi-check-circle text-primary mt-1"></i>
+                            <span>Free returns within 30 days to keep shopping risk-free.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2 mb-2">
+                            <i class="bi bi-lightning-charge text-primary mt-1"></i>
+                            <span>Fast dispatch — most orders ship within 24 hours.</span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-shield-check text-primary mt-1"></i>
+                            <span>Backed by our quality guarantee and friendly support.</span>
+                        </li>
+                    </ul>
 
+                    <div class="mt-auto">
+                        @if (!isAdmin)
+                        {
+                            <div class="d-flex flex-column flex-sm-row gap-3 mb-3">
+                                <form asp-controller="Cart" asp-action="Add" method="post" class="d-grid flex-grow-1">
+                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-primary btn-lg">Add to cart</button>
+                                </form>
+                                <form asp-controller="Wishlist" asp-action="Add" method="post" class="d-grid flex-grow-1">
+                                    <input type="hidden" name="productId" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-outline-primary btn-lg">Save to wishlist</button>
+                                </form>
+                            </div>
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-link text-decoration-none p-0">Continue browsing</a>
+                        }
+                        else
+                        {
+                            <div class="d-flex flex-column flex-sm-row gap-3">
+                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary btn-lg">Edit listing</a>
+                                <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger btn-lg">Delete</a>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

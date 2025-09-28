@@ -1,28 +1,129 @@
-﻿@model B2CEcommerceApp.Models.Order
+@model B2CEcommerceApp.Models.Order
+@using B2CEcommerceApp.Models
+@using System.Linq
 
-<h2>Order Confirmation</h2>
-<p>Thank you for your order!</p>
+@{
+    ViewData["Title"] = "Order confirmation";
+    var items = Model.OrderItems ?? Enumerable.Empty<OrderItem>();
+    var subtotal = items.Sum(item => item.UnitPrice * item.Quantity);
+    var orderTotal = Model.TotalAmount > 0 ? Model.TotalAmount : subtotal;
+    var shipping = Math.Max(orderTotal - subtotal, 0M);
+    var expectedDelivery = Model.OrderDate.AddDays(5);
+    var contactPhone = string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber!;
+}
 
-<p><strong>Order ID:</strong> @Model.Id</p>
-<p><strong>Date:</strong> @Model.OrderDate</p>
-<p><strong>Payment Method:</strong> @Model.PaymentMethod</p>
-<p><strong>Status:</strong> @Model.Status</p>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <span class="hero-badge">Order confirmed</span>
+            <h1 class="section-title mt-3">Thank you for shopping with us!</h1>
+            <p class="text-secondary mb-0">We've emailed a copy of your receipt and will keep you posted as your items make their way to you.</p>
+        </div>
 
-<h3>Items:</h3>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Quantity</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.OrderItems)
-        {
-            <tr>
-                <td>@item.Product.Name</td>
-                <td>@item.Quantity</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card card-lift p-4 h-100">
+                    <div class="d-flex flex-column flex-sm-row justify-content-between gap-3 mb-4">
+                        <div>
+                            <span class="text-secondary text-uppercase small fw-semibold">Order ID</span>
+                            <div class="fs-4 fw-bold">#@Model.Id</div>
+                        </div>
+                        <div class="text-sm-end">
+                            <span class="text-secondary text-uppercase small fw-semibold">Placed on</span>
+                            <div class="fw-semibold">@Model.OrderDate.ToString("MMMM dd, yyyy")</div>
+                        </div>
+                    </div>
+
+                    <div class="bg-light rounded-4 p-4 mb-4">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <span class="text-secondary text-uppercase small fw-semibold">Status</span>
+                                <div class="fw-semibold">@Model.Status</div>
+                            </div>
+                            <div class="col-sm-6">
+                                <span class="text-secondary text-uppercase small fw-semibold">Payment</span>
+                                <div class="fw-semibold">@Model.PaymentMethod</div>
+                            </div>
+                            <div class="col-12">
+                                <span class="text-secondary text-uppercase small fw-semibold">Estimated delivery</span>
+                                <div class="fw-semibold">@expectedDelivery.ToString("dddd, MMMM dd")</div>
+                                <small class="text-secondary">We'll notify you as soon as your package ships.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="h5 fw-bold mb-3">Items in your order</h2>
+                    @if (!items.Any())
+                    {
+                        <div class="empty-state">
+                            <h3 class="fw-semibold mb-2">No items recorded</h3>
+                            <p class="text-secondary mb-0">If something looks off, reach out to support and we'll make it right.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            @foreach (var item in items)
+                            {
+                                var imageUrl = string.IsNullOrWhiteSpace(item.Product?.ImageUrl)
+                                    ? "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80"
+                                    : item.Product!.ImageUrl;
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="summary-thumb">
+                                        <img src="@imageUrl" alt="@item.Product?.Name" onerror="this.src='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80';" />
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold">@(item.Product?.Name ?? $"Product #{item.ProductId}")</div>
+                                        <small class="text-secondary">Qty: @item.Quantity</small>
+                                    </div>
+                                    <div class="fw-semibold">@((item.UnitPrice * item.Quantity).ToString("C"))</div>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    <div class="border rounded-4 p-4 bg-light">
+                        <h3 class="h6 text-uppercase fw-semibold text-secondary mb-3">Delivery details</h3>
+                        <p class="mb-2"><i class="bi bi-geo-alt text-primary me-2"></i>@(string.IsNullOrWhiteSpace(Model.ShippingAddress) ? "Shipping address will be provided at checkout." : Model.ShippingAddress)</p>
+                        <p class="mb-0"><i class="bi bi-telephone text-primary me-2"></i>@contactPhone</p>
+                        <small class="text-secondary d-block mt-3">Order updates will be sent to your registered email address.</small>
+                    </div>
+
+                    <div class="d-flex flex-column flex-sm-row gap-3 mt-4">
+                        <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg">Continue shopping</a>
+                        <a asp-action="Index" class="btn btn-outline-primary btn-lg">View my orders</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-5">
+                <div class="card card-lift p-4">
+                    <h2 class="h5 fw-bold mb-4">Order summary</h2>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Subtotal</span>
+                        <span class="fw-semibold">@subtotal.ToString("C")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Shipping</span>
+                        <span class="fw-semibold">@shipping.ToString("C")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="fw-bold text-uppercase">Total paid</span>
+                        <span class="fw-bold text-primary">@orderTotal.ToString("C")</span>
+                    </div>
+                    <hr />
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Payment method</span>
+                        <span class="fw-semibold">@Model.PaymentMethod</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Status</span>
+                        <span class="fw-semibold">@Model.Status</span>
+                    </div>
+                    <div class="alert alert-soft mt-4" role="alert">
+                        Questions about your purchase? Email <a href="mailto:support@shoply.com" class="link-underline">support@shoply.com</a> and include your order ID.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
