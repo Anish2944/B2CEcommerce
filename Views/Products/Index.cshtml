@@ -102,7 +102,7 @@ else
                                         <input type="hidden" name="productId" value="@item.Id" />
 
                                         <input type="hidden" name="returnUrl" value="@Url.Action("Checkout", "Orders")" />
-                                        <button type="submit" class="btn btn-primary btn-sm">Add to cart</button>
+                                        <button type="submit" class="btn btn-primary btn-sm">Buy Now</button>
                                     </form>
                                     <form asp-controller="Wishlist" asp-action="Add" method="post">
                                         <input type="hidden" name="productId" value="@item.Id" />
