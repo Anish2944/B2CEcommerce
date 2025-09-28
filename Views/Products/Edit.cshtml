@@ -1,58 +1,82 @@
-﻿@model B2CEcommerceApp.Models.Product
+@model B2CEcommerceApp.Models.Product
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit product";
+    var imagePreview = string.IsNullOrWhiteSpace(Model.ImageUrl)
+        ? "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80"
+        : Model.ImageUrl;
 }
 
-<h1>Edit</h1>
-
-<h4>Product</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-left"></i> Back to products</a>
+            <span class="badge-soft">SKU #@Model.Id</span>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-7">
+                <div class="card card-lift p-4 h-100">
+                    <h1 class="h4 fw-bold mb-3">Update product details</h1>
+                    <p class="text-secondary mb-4">Fine-tune content, pricing, and inventory to keep your catalogue accurate.</p>
+                    <form asp-action="Edit" class="row g-4">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <div class="col-12">
+                            <label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+                            <select asp-for="CategoryId" class="form-select form-select-lg" asp-items="ViewBag.CategoryId"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label fw-semibold">Product name</label>
+                            <input asp-for="Name" class="form-control form-control-lg" placeholder="Product title" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Price" class="form-label fw-semibold">Price</label>
+                            <input asp-for="Price" class="form-control form-control-lg" placeholder="0.00" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                            <textarea asp-for="Description" rows="4" class="form-control" placeholder="Tell customers about the product"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-8">
+                            <label asp-for="ImageUrl" class="form-label fw-semibold">Image URL</label>
+                            <input asp-for="ImageUrl" class="form-control" placeholder="https://" />
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Stock" class="form-label fw-semibold">Stock</label>
+                            <input asp-for="Stock" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger"></span>
+                        </div>
+                        <div class="col-12 d-flex gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Save changes</button>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-lg">Preview</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+            <div class="col-lg-5">
+                <div class="card card-lift overflow-hidden h-100">
+                    <div class="ratio ratio-4x3 bg-light">
+                        <img src="@imagePreview" alt="@Model.Name" class="object-fit-cover" onerror="this.src='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80';" />
+                    </div>
+                    <div class="card-body">
+                        <h2 class="h5 fw-bold mb-1">Live preview</h2>
+                        <p class="text-secondary mb-3">Use this preview to ensure your imagery looks crisp and on-brand.</p>
+                        <ul class="list-unstyled text-secondary small mb-0">
+                            <li><i class="bi bi-check-circle text-primary me-2"></i>High-resolution imagery recommended</li>
+                            <li><i class="bi bi-check-circle text-primary me-2"></i>Keep descriptions under 200 characters</li>
+                            <li><i class="bi bi-check-circle text-primary me-2"></i>Ensure pricing matches market strategy</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Stock" class="control-label"></label>
-                <input asp-for="Stock" class="form-control" />
-                <span asp-validation-for="Stock" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+</section>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
