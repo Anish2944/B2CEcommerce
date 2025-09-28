@@ -1,20 +1,127 @@
-﻿@model Microsoft.AspNetCore.Identity.IdentityUser
+@model Microsoft.AspNetCore.Identity.IdentityUser
+@using System.Linq
 
-<h2>My Profile</h2>
+@{
+    ViewData["Title"] = "My profile";
+    var isAdmin = User.IsInRole("Admin");
+    var displayName = string.IsNullOrWhiteSpace(Model.UserName) ? Model.Email : Model.UserName;
+    displayName ??= "Account";
+    var seed = string.IsNullOrWhiteSpace(displayName) ? (Model.Email ?? "User") : displayName!;
+    var initials = new string(seed.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+        .Where(part => !string.IsNullOrWhiteSpace(part))
+        .Select(part => char.ToUpperInvariant(part[0]))
+        .Take(2)
+        .DefaultIfEmpty(char.ToUpperInvariant(seed[0]))
+        .ToArray());
+    if (string.IsNullOrWhiteSpace(initials))
+    {
+        initials = seed.Substring(0, Math.Min(2, seed.Length)).ToUpperInvariant();
+    }
+    var contactEmail = string.IsNullOrWhiteSpace(Model.Email) ? "Not provided" : Model.Email!;
+    var phoneNumber = string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber!;
+    var verificationStatus = Model.EmailConfirmed ? "Email verified" : "Awaiting verification";
+    var roleName = isAdmin ? "Admin" : "Customer";
+}
 
-<p><strong>Email:</strong> @Model.Email</p>
-<p><strong>Username:</strong> @Model.UserName</p>
-@if (User.IsInRole("Admin"))
-{
-    <p><strong>Role:</strong> Admin</p>
-}
-else
-{
-    <p><strong>Role:</strong> Customer</p>
-}
-
-@if (!User.IsInRole("Admin"))
-{
-    <a asp-controller="Orders" asp-action="Index" class="btn btn-primary">My Orders</a>
-    <a asp-controller="Wishlist" asp-action="Index" class="btn btn-warning">My Wishlist</a>
-}
+<section class="page-section">
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card card-lift p-4 h-100 text-center">
+                    <div class="avatar-circle mx-auto mb-3 text-white" style="width:4.5rem; height:4.5rem; font-size:1.75rem;">
+                        @initials
+                    </div>
+                    <h1 class="h4 fw-bold mb-1">@displayName</h1>
+                    <span class="badge-soft">@roleName account</span>
+                    <p class="text-secondary mt-3">You're in control of your personal details, preferences, and order history.</p>
+                    <div class="d-grid gap-3 mt-4">
+                        @if (!isAdmin)
+                        {
+                            <a asp-controller="Orders" asp-action="Index" class="btn btn-primary btn-lg">View my orders</a>
+                            <a asp-controller="Wishlist" asp-action="Index" class="btn btn-outline-primary btn-lg">Open wishlist</a>
+                        }
+                        else
+                        {
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg">Manage catalogue</a>
+                            <a asp-controller="Categories" asp-action="Index" class="btn btn-outline-primary btn-lg">Manage categories</a>
+                        }
+                        <a asp-area="Identity" asp-page="/Account/Manage/Index" class="btn btn-link text-decoration-none">Account settings</a>
+                    </div>
+                    <div class="alert alert-soft mt-4 mb-0" role="alert">
+                        Need to update credentials? Visit <a asp-area="Identity" asp-page="/Account/Manage/ChangePassword" class="link-underline">security settings</a> anytime.
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="row g-4">
+                    <div class="col-12">
+                        <div class="card card-lift p-4 h-100">
+                            <h2 class="h5 fw-bold mb-4">Account snapshot</h2>
+                            <div class="row g-4">
+                                <div class="col-sm-6">
+                                    <div class="bg-light rounded-4 p-3 h-100">
+                                        <span class="text-secondary text-uppercase small fw-semibold">Email</span>
+                                        <div class="fw-semibold">@contactEmail</div>
+                                        <small class="text-secondary">@verificationStatus</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="bg-light rounded-4 p-3 h-100">
+                                        <span class="text-secondary text-uppercase small fw-semibold">Username</span>
+                                        <div class="fw-semibold">@(!string.IsNullOrWhiteSpace(Model.UserName) ? Model.UserName : "Not provided")</div>
+                                        <small class="text-secondary">Visible on reviews and wishlists</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="bg-light rounded-4 p-3 h-100">
+                                        <span class="text-secondary text-uppercase small fw-semibold">Phone</span>
+                                        <div class="fw-semibold">@phoneNumber</div>
+                                        <small class="text-secondary">Used for delivery updates</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="bg-light rounded-4 p-3 h-100">
+                                        <span class="text-secondary text-uppercase small fw-semibold">Two-factor</span>
+                                        <div class="fw-semibold">@(Model.TwoFactorEnabled ? "Enabled" : "Disabled")</div>
+                                        <small class="text-secondary">Add an extra layer of security to your account</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div class="card card-lift p-4 h-100">
+                            <h2 class="h5 fw-bold mb-3">Stay in the loop</h2>
+                            <p class="text-secondary">Review your latest activity, keep your information current, and explore exclusive perks.</p>
+                            <ul class="list-unstyled text-secondary small mb-4">
+                                <li class="d-flex align-items-start gap-2 mb-2">
+                                    <i class="bi bi-bell text-primary mt-1"></i>
+                                    <span>Opt into order updates so you're notified the moment anything ships.</span>
+                                </li>
+                                <li class="d-flex align-items-start gap-2 mb-2">
+                                    <i class="bi bi-heart text-primary mt-1"></i>
+                                    <span>Save favourites to your wishlist for quick access later.</span>
+                                </li>
+                                <li class="d-flex align-items-start gap-2">
+                                    <i class="bi bi-shield-lock text-primary mt-1"></i>
+                                    <span>Strengthen account security by enabling two-factor authentication.</span>
+                                </li>
+                            </ul>
+                            <div class="d-flex flex-column flex-sm-row gap-3">
+                                <a asp-controller="Home" asp-action="Privacy" class="btn btn-outline-primary btn-lg">Review privacy policy</a>
+                                @if (isAdmin)
+                                {
+                                    <a asp-controller="Orders" asp-action="Manage" class="btn btn-outline-primary btn-lg">Manage orders</a>
+                                }
+                                else
+                                {
+                                    <a asp-controller="Orders" asp-action="Index" class="btn btn-outline-primary btn-lg">Track my orders</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
