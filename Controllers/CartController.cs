@@ -30,7 +30,7 @@ public class CartController : Controller
 
     // POST: /Cart/Add
     [HttpPost]
-    public async Task<IActionResult> Add(int productId)
+    public async Task<IActionResult> Add(int productId, string? returnUrl = null)
     {
         var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -48,7 +48,15 @@ public class CartController : Controller
         }
 
         await _context.SaveChangesAsync();
-        return RedirectToAction("Index");
+
+        TempData["CartMessage"] = "Product added to your cart.";
+
+        if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
+        {
+            return LocalRedirect(returnUrl);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     // POST: /Cart/Remove

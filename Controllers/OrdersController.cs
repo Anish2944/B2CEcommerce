@@ -40,6 +40,30 @@ public class OrdersController : Controller
         return View(orders);
     }
 
+    // View order details (customer or admin)
+    public async Task<IActionResult> Details(int id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isAdmin = User.IsInRole("Admin");
+
+        var order = await _context.Orders
+            .Include(o => o.OrderItems)
+            .ThenInclude(i => i.Product)
+            .FirstOrDefaultAsync(o => o.Id == id);
+
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        if (!isAdmin && order.UserId != userId)
+        {
+            return Forbid();
+        }
+
+        return View(order);
+    }
+
     // ADMIN: Mark an order as shipped
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> MarkShipped(int id)
