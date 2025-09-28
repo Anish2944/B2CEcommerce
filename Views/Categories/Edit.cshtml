@@ -1,34 +1,39 @@
-﻿@model B2CEcommerceApp.Models.Category
+@model B2CEcommerceApp.Models.Category
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit category";
 }
 
-<h1>Edit</h1>
-
-<h4>Category</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="mb-4 d-flex justify-content-between align-items-center">
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-left"></i> Back to categories</a>
+            <span class="badge-soft">Editing @Model.Name</span>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="card card-lift p-4">
+                    <h1 class="h4 fw-bold mb-3">Update category</h1>
+                    <p class="text-secondary mb-4">Rename or adjust how the category appears across the storefront.</p>
+                    <form asp-action="Edit" class="d-flex flex-column gap-4">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <div>
+                            <label asp-for="Name" class="form-label fw-semibold">Category name</label>
+                            <input asp-for="Name" class="form-control form-control-lg" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="d-flex gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Save changes</button>
+                            <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-lg">View details</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+</section>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
