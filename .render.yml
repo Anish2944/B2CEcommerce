@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: b2cecommerceapp
+    env: docker
+    plan: free
+    autoDeploy: true
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        sync: false   # You’ll add it manually in Render dashboard
