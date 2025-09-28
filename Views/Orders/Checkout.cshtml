@@ -1,22 +1,122 @@
-﻿@model B2CEcommerceApp.Models.Order
+@model B2CEcommerceApp.Models.Order
+@using B2CEcommerceApp.Models
+@using System.Linq
 
-<h2>Checkout</h2>
-<form asp-action="Checkout" method="post">
-    <div class="form-group">
-        <label asp-for="ShippingAddress"></label>
-        <input asp-for="ShippingAddress" class="form-control" />
-        <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+@{
+    ViewData["Title"] = "Checkout";
+    var cartItems = ViewBag.CartItems as IEnumerable<CartItem> ?? Enumerable.Empty<CartItem>();
+    var hasItems = cartItems.Any();
+    var subtotal = cartItems.Sum(ci => (ci.Product?.Price ?? 0M) * ci.Quantity);
+    var shipping = hasItems ? Math.Min(subtotal * 0.05M, 25M) : 0M;
+    var orderTotal = subtotal + shipping;
+}
+
+<section class="page-section">
+    <div class="container py-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-5">
+            <div>
+                <span class="hero-badge">Secure checkout</span>
+                <h1 class="section-title mt-3 mb-2">Complete your order</h1>
+                <p class="text-secondary mb-0">Provide shipping details and review your cart before placing the order.</p>
+            </div>
+            @if (hasItems)
+            {
+                <div class="text-md-end">
+                    <span class="text-secondary small text-uppercase fw-semibold">Order total</span>
+                    <div class="display-6 fw-bold text-primary">@orderTotal.ToString("C")</div>
+                </div>
+            }
+        </div>
+
+        @if (!hasItems)
+        {
+            <div class="empty-state">
+                <h3 class="fw-semibold mb-2">Your cart is empty</h3>
+                <p class="text-secondary mb-4">Add a few products to the cart and return to checkout when you're ready.</p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg">Browse products</a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                <div class="col-lg-7">
+                    <div class="card card-lift p-4 h-100">
+                        <h2 class="h4 fw-bold mb-4">Shipping details</h2>
+                        <form asp-action="Checkout" method="post" class="row g-4">
+                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                            <div class="col-12">
+                                <label asp-for="ShippingAddress" class="form-label fw-semibold">Delivery address</label>
+                                <textarea asp-for="ShippingAddress" rows="3" class="form-control form-control-lg" placeholder="Street, house number, city, ZIP"></textarea>
+                                <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PhoneNumber" class="form-label fw-semibold">Contact number</label>
+                                <input asp-for="PhoneNumber" class="form-control form-control-lg" placeholder="(+1) 555-123-4567" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="PaymentMethod" class="form-label fw-semibold">Payment method</label>
+                                <select asp-for="PaymentMethod" class="form-select form-select-lg">
+                                    <option value="Cash on Delivery">Cash on Delivery</option>
+                                    <option value="Card on Delivery">Card on Delivery</option>
+                                    <option value="UPI">UPI</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
+                                    <a asp-controller="Cart" asp-action="Index" class="btn btn-outline-primary btn-lg">Back to cart</a>
+                                    <button type="submit" class="btn btn-primary btn-lg">Place secure order</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-lg-5">
+                    <div class="card card-lift p-4">
+                        <h2 class="h5 fw-bold mb-4">Order summary</h2>
+                        <div class="d-flex flex-column gap-3 mb-4">
+                            @foreach (var item in cartItems)
+                            {
+                                var imageUrl = item.Product?.ImageUrl;
+                                if (string.IsNullOrWhiteSpace(imageUrl))
+                                {
+                                    imageUrl = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80";
+                                }
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="summary-thumb">
+                                        <img src="@imageUrl" alt="@item.Product?.Name" onerror="this.src='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80';" />
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="fw-semibold">@item.Product?.Name</div>
+                                        <small class="text-secondary">Qty: @item.Quantity</small>
+                                    </div>
+                                    <div class="fw-semibold">@((item.Product?.Price ?? 0M).ToString("C"))</div>
+                                </div>
+                            }
+                        </div>
+                        <hr class="my-4" />
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">Subtotal</span>
+                            <span class="fw-semibold">@subtotal.ToString("C")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">Shipping</span>
+                            <span class="fw-semibold">@shipping.ToString("C")</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-bold text-uppercase">Total</span>
+                            <span class="fw-bold text-primary">@orderTotal.ToString("C")</span>
+                        </div>
+                        <div class="alert alert-soft mt-4 mb-0" role="alert">
+                            <strong>Need help?</strong> Our support team is available 24/7 at <a href="mailto:support@shoply.com" class="link-underline">support@shoply.com</a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
     </div>
-    <div class="form-group">
-        <label asp-for="PhoneNumber"></label>
-        <input asp-for="PhoneNumber" class="form-control" />
-        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="PaymentMethod"></label>
-        <select asp-for="PaymentMethod" class="form-control">
-            <option>Cash on Delivery</option>
-        </select>
-    </div>
-    <button type="submit" class="btn btn-primary">Place Order</button>
-</form>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

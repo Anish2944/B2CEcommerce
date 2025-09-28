@@ -1,23 +1,88 @@
-﻿@model IEnumerable<B2CEcommerceApp.Models.Order>
+@using System.Linq
+@model IEnumerable<B2CEcommerceApp.Models.Order>
 
-<h2>My Orders</h2>
+@{
+    ViewData["Title"] = "My orders";
+    var orders = (Model ?? System.Linq.Enumerable.Empty<B2CEcommerceApp.Models.Order>())
+        .OrderByDescending(o => o.OrderDate)
+        .ToList();
+    var hasOrders = orders.Any();
+}
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Order Date</th>
-            <th>Total</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var order in Model)
+<section class="page-section">
+    <div class="container py-5">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-5">
+            <div>
+                <span class="hero-badge">Order history</span>
+                <h1 class="section-title mt-3 mb-2">Track your purchases</h1>
+                <p class="text-secondary mb-0">Review past orders, check statuses, and revisit the products you loved.</p>
+            </div>
+            @if (hasOrders)
+            {
+                var lifetimeSpend = orders.Sum(o => o.TotalAmount);
+                <div class="card card-lift p-4">
+                    <span class="text-secondary text-uppercase small fw-semibold">Lifetime spend</span>
+                    <div class="display-6 fw-bold text-primary">@lifetimeSpend.ToString("C")</div>
+                </div>
+            }
+        </div>
+
+        @if (!hasOrders)
         {
-            <tr>
-                <td>@order.OrderDate</td>
-                <td>@order.TotalAmount</td>
-                <td><a asp-action="Details" asp-route-id="@order.Id">View</a></td>
-            </tr>
+            <div class="empty-state">
+                <h3 class="fw-semibold mb-2">You haven't placed any orders yet</h3>
+                <p class="text-secondary mb-4">Browse our collection and find something special to get started.</p>
+                <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg">Start shopping</a>
+            </div>
         }
-    </tbody>
-</table>
+        else
+        {
+            <div class="row g-4">
+                @foreach (var order in orders)
+                {
+                    var itemsCount = order.OrderItems?.Sum(i => i.Quantity) ?? 0;
+                    var productsPreview = order.OrderItems?
+                        .Select(i => i.Product?.Name)
+                        .Where(name => !string.IsNullOrWhiteSpace(name))
+                        .Take(3)
+                        .ToList() ?? new System.Collections.Generic.List<string>();
+                    <div class="col-12">
+                        <div class="card card-lift p-4 h-100">
+                            <div class="d-flex flex-column flex-lg-row justify-content-between gap-4">
+                                <div class="d-flex flex-column flex-md-row gap-4">
+                                    <div class="order-badge align-self-start">
+                                        <span class="text-uppercase text-secondary small">Order</span>
+                                        <div class="fw-bold fs-4">#@order.Id</div>
+                                    </div>
+                                    <div>
+                                        <h2 class="h4 fw-semibold mb-2">Placed on @order.OrderDate.ToString("MMM dd, yyyy")</h2>
+                                        <div class="d-flex flex-wrap gap-3 text-secondary small">
+                                            <span><i class="bi bi-box-seam me-1"></i>@itemsCount item(s)</span>
+                                            <span><i class="bi bi-currency-dollar me-1"></i>@order.TotalAmount.ToString("C")</span>
+                                            <span class="text-capitalize"><i class="bi bi-truck me-1"></i>@order.Status</span>
+                                        </div>
+                                        @if (productsPreview.Any())
+                                        {
+                                            <div class="mt-3 small text-secondary">
+                                                <strong class="text-dark">Highlights:</strong>
+                                                @string.Join(", ", productsPreview)
+                                                @if ((order.OrderItems?.Count ?? 0) > productsPreview.Count)
+                                                {
+                                                    <span>+ more</span>
+                                                }
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column align-items-start align-items-lg-end gap-3">
+                                    <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-primary btn-lg">View details</a>
+                                    <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary btn-lg">Shop again</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>

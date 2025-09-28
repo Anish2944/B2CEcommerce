@@ -40,6 +40,30 @@ public class OrdersController : Controller
         return View(orders);
     }
 
+    // View order details (customer or admin)
+    public async Task<IActionResult> Details(int id)
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var isAdmin = User.IsInRole("Admin");
+
+        var order = await _context.Orders
+            .Include(o => o.OrderItems)
+            .ThenInclude(i => i.Product)
+            .FirstOrDefaultAsync(o => o.Id == id);
+
+        if (order == null)
+        {
+            return NotFound();
+        }
+
+        if (!isAdmin && order.UserId != userId)
+        {
+            return Forbid();
+        }
+
+        return View(order);
+    }
+
     // ADMIN: Mark an order as shipped
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> MarkShipped(int id)
@@ -67,9 +91,18 @@ public class OrdersController : Controller
     }
 
     // GET: Checkout
-    public IActionResult Checkout()
+    public async Task<IActionResult> Checkout()
     {
-        return View();
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+        var cartItems = await _context.CartItems
+            .Include(c => c.Product)
+            .Where(c => c.UserId == userId)
+            .ToListAsync();
+
+        ViewBag.CartItems = cartItems;
+
+        return View(new Order());
     }
 
     // POST: Checkout
@@ -88,17 +121,26 @@ public class OrdersController : Controller
         if (!cartItems.Any())
         {
             ModelState.AddModelError("", "Your cart is empty!");
+            ViewBag.CartItems = cartItems;
+            return View(order);
+        }
+
+        if (!ModelState.IsValid)
+        {
+            ViewBag.CartItems = cartItems;
             return View(order);
         }
 
         // Create new order
         order.UserId = userId!;
         order.OrderDate = DateTime.Now;
+        order.TotalAmount = cartItems.Sum(c => (c.Product?.Price ?? 0M) * c.Quantity);
 
         order.OrderItems = cartItems.Select(c => new OrderItem
         {
             ProductId = c.ProductId,
-            Quantity = c.Quantity
+            Quantity = c.Quantity,
+            UnitPrice = c.Product?.Price ?? 0M
         }).ToList();
 
         _context.Orders.Add(order);

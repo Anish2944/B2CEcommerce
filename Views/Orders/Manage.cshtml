@@ -1,40 +1,84 @@
-﻿@model IEnumerable<B2CEcommerceApp.Models.Order>
+@using System.Linq
+@model IEnumerable<B2CEcommerceApp.Models.Order>
 
-<h2>Manage Orders</h2>
+@{
+    ViewData["Title"] = "Manage orders";
+    var orders = (Model ?? System.Linq.Enumerable.Empty<B2CEcommerceApp.Models.Order>())
+        .OrderByDescending(o => o.OrderDate)
+        .ToList();
+    var hasOrders = orders.Any();
+}
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Order ID</th>
-            <th>User</th>
-            <th>Date</th>
-            <th>Status</th>
-            <th>Total</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var order in Model)
-    {
-        <tr>
-            <td>@order.Id</td>
-            <td>@order.UserId</td>
-            <td>@order.OrderDate</td>
-            <td>@order.Status</td>
-            <td>@order.TotalAmount</td>
-            <td>
-                <form asp-action="UpdateStatus" method="post" class="d-inline">
-                    <input type="hidden" name="id" value="@order.Id" />
-                    <select name="status" class="form-select form-select-sm d-inline w-auto">
-                        <option value="Pending" selected="@(order.Status == "Pending" ? "selected" : null)">Pending</option>
-                        <option value="Shipped" selected="@(order.Status == "Shipped" ? "selected" : null)">Shipped</option>
-                        <option value="Delivered" selected="@(order.Status == "Delivered" ? "selected" : null)">Delivered</option>
-                        <option value="Cancelled" selected="@(order.Status == "Cancelled" ? "selected" : null)">Cancelled</option>
-                    </select>
-                    <button type="submit" class="btn btn-sm btn-primary">Update</button>
-                </form>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-5">
+            <div>
+                <span class="hero-badge">Admin workspace</span>
+                <h1 class="section-title mt-3 mb-2">Order management</h1>
+                <p class="text-secondary mb-0">Monitor order health, update fulfillment statuses, and dive into detailed receipts.</p>
+            </div>
+            @if (hasOrders)
+            {
+                var pending = orders.Count(o => o.Status == "Pending");
+                <div class="card card-lift p-4 text-lg-end">
+                    <span class="text-secondary text-uppercase small fw-semibold">Pending fulfillment</span>
+                    <div class="display-6 fw-bold text-primary">@pending</div>
+                </div>
+            }
+        </div>
+
+        @if (!hasOrders)
+        {
+            <div class="empty-state">
+                <h3 class="fw-semibold mb-2">No orders yet</h3>
+                <p class="text-secondary mb-0">Once customers start purchasing, their orders will appear here for review.</p>
+            </div>
+        }
+        else
+        {
+            <div class="table-responsive shadow-sm rounded-4 overflow-hidden">
+                <table class="table table-borderless align-middle mb-0">
+                    <thead class="bg-light text-secondary text-uppercase small fw-semibold">
+                        <tr>
+                            <th scope="col">Order</th>
+                            <th scope="col">Placed</th>
+                            <th scope="col">Customer</th>
+                            <th scope="col">Total</th>
+                            <th scope="col">Status</th>
+                            <th scope="col" class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        @foreach (var order in orders)
+                        {
+                            <tr class="border-bottom">
+                                <td class="fw-semibold">#@order.Id</td>
+                                <td>@order.OrderDate.ToString("dd MMM yyyy")</td>
+                                <td class="text-secondary">@order.UserId</td>
+                                <td class="fw-semibold text-primary">@order.TotalAmount.ToString("C")</td>
+                                <td>
+                                    <span class="badge-soft text-capitalize">@order.Status</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-outline-primary btn-sm">View</a>
+                                        <form asp-action="UpdateStatus" method="post" class="d-flex gap-2 align-items-center">
+                                            <input type="hidden" name="id" value="@order.Id" />
+                                            <select name="status" class="form-select form-select-sm">
+                                                <option value="Pending" selected="@(order.Status == "Pending" ? "selected" : null)">Pending</option>
+                                                <option value="Shipped" selected="@(order.Status == "Shipped" ? "selected" : null)">Shipped</option>
+                                                <option value="Delivered" selected="@(order.Status == "Delivered" ? "selected" : null)">Delivered</option>
+                                                <option value="Cancelled" selected="@(order.Status == "Cancelled" ? "selected" : null)">Cancelled</option>
+                                            </select>
+                                            <button type="submit" class="btn btn-primary btn-sm">Update</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</section>

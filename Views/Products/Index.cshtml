@@ -1,90 +1,118 @@
-﻿@model IEnumerable<B2CEcommerceApp.Models.Product>
+@model IEnumerable<B2CEcommerceApp.Models.Product>
 @using Microsoft.AspNetCore.Mvc.Rendering
+@using System.Linq
 
 @{
     ViewData["Title"] = "Products";
     var categories = ViewData["Categories"] as SelectList;
+    bool isAdmin = User.IsInRole("Admin");
 }
 
-<h2>Products</h2>
-
-<form method="get" class="row g-2 mb-3">
-    <div class="col-md-4">
-        <input type="text" name="searchString" value="@Context.Request.Query["searchString"]"
-               class="form-control" placeholder="Search products..." />
+<section class="mb-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+        <div>
+            <h1 class="section-title mb-1">Discover our products</h1>
+            <p class="text-secondary mb-0">Browse curated selections, filter by category, or search for something specific.</p>
+        </div>
+        @if (isAdmin)
+        {
+            <a asp-action="Create" class="btn btn-primary btn-lg">Add new product</a>
+        }
     </div>
-    <div class="col-md-4">
-        <select name="categoryId" class="form-select">
-            <option value="">All Categories</option>
-            @if (categories != null)
-            {
-                foreach (var c in categories)
+
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-lg-4">
+            <label class="form-label fw-semibold">Search</label>
+            <input type="text" name="searchString" value="@Context.Request.Query["searchString"]"
+                   class="form-control form-control-lg" placeholder="Search products, brands, or keywords" />
+        </div>
+        <div class="col-lg-4">
+            <label class="form-label fw-semibold">Category</label>
+            <select name="categoryId" class="form-select form-select-lg">
+                <option value="">All categories</option>
+                @if (categories != null)
                 {
-                    <option value="@c.Value" selected="@(c.Value == Context.Request.Query["categoryId"])">
-                        @c.Text
-                    </option>
+                    foreach (var c in categories)
+                    {
+                        var isSelected = c.Value == Context.Request.Query["categoryId"];
+                        <option value="@c.Value" selected="@(isSelected)">@c.Text</option>
+                    }
                 }
-            }
-        </select>
-    </div>
-    <div class="col-md-4">
-        <button type="submit" class="btn btn-primary">Search</button>
-    </div>
-</form>
+            </select>
+        </div>
+        <div class="col-lg-4">
+            <label class="form-label fw-semibold">&nbsp;</label>
+            <div>
+                <button type="submit" class="btn btn-primary btn-lg me-2">Apply filters</button>
+                <a asp-action="Index" class="btn btn-outline-primary btn-lg">Reset</a>
+            </div>
+        </div>
+    </form>
+</section>
 
-@if (User.IsInRole("Admin"))
+@if (!Model.Any())
 {
-    <p>
-        <a asp-action="Create" class="btn btn-success">Create New Product</a>
-    </p>
+    <div class="empty-state">
+        <h3 class="fw-semibold mb-2">We couldn't find anything matching your filters.</h3>
+        <p class="text-secondary mb-4">Try adjusting your search or exploring our full catalog.</p>
+        <a asp-action="Index" class="btn btn-primary">View all products</a>
+    </div>
 }
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.Name)</th>
-            <th>@Html.DisplayNameFor(model => model.Description)</th>
-            <th>@Html.DisplayNameFor(model => model.Price)</th>
-            <th>@Html.DisplayNameFor(model => model.ImageUrl)</th>
-            <th>@Html.DisplayNameFor(model => model.Stock)</th>
-            <th>Category</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
+else
+{
+    <div class="row g-4">
         @foreach (var item in Model)
         {
-            <tr>
-                <td>@item.Name</td>
-                <td>@item.Description</td>
-                <td>@item.Price</td>
-                <td>@item.ImageUrl</td>
-                <td>@item.Stock</td>
-                <td>@(item.Category != null ? item.Category.Name : "Others")</td>
-                <td>
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> 
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> 
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-                    }
-                    else
-                    {
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a>
-
-                        <form asp-controller="Cart" asp-action="Add" method="post" class="d-inline">
-                            <input type="hidden" name="productId" value="@item.Id" />
-                            <button type="submit" class="btn btn-success btn-sm">Add to Cart</button>
-                        </form>
-
-                        <form asp-controller="Wishlist" asp-action="Add" method="post" class="d-inline">
-                            <input type="hidden" name="productId" value="@item.Id" />
-                            <button type="submit" class="btn btn-warning btn-sm">Add to Wishlist</button>
-                        </form>
-                    }
-
-                </td>
-            </tr>
+            var imageUrl = string.IsNullOrWhiteSpace(item.ImageUrl)
+                ? "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80"
+                : item.ImageUrl;
+            <div class="col-sm-6 col-lg-4">
+                <div class="card card-lift h-100 overflow-hidden position-relative">
+                    <div class="ratio ratio-4x3 bg-light">
+                        <img src="@imageUrl" class="object-fit-cover" alt="@item.Name" onerror="this.src='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80';" />
+                    </div>
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <span class="badge-soft">@((item.Category != null ? item.Category.Name : "General"))</span>
+                            <span class="fw-bold text-primary fs-4">@item.Price.ToString("C")</span>
+                        </div>
+                        <h5 class="fw-semibold mb-2">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="stretched-link text-reset text-decoration-none">@item.Name</a>
+                        </h5>
+                        <p class="text-secondary flex-grow-1">@item.Description</p>
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <small class="text-secondary"><i class="bi bi-box"></i> In stock: @item.Stock</small>
+                            @if (isAdmin)
+                            {
+                                <div class="dropdown z-1">
+                                    <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        Manage
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0">
+                                        <li><a class="dropdown-item" asp-action="Edit" asp-route-id="@item.Id">Edit</a></li>
+                                        <li><a class="dropdown-item" asp-action="Details" asp-route-id="@item.Id">Details</a></li>
+                                        <li><a class="dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
+                                    </ul>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="d-flex gap-2 position-relative z-1">
+                                    <form asp-controller="Cart" asp-action="Add" method="post">
+                                        <input type="hidden" name="productId" value="@item.Id" />
+                                        <input type="hidden" name="returnUrl" value="@Url.Action("Checkout", "Orders")" />
+                                        <button type="submit" class="btn btn-primary btn-sm">Add to cart</button>
+                                    </form>
+                                    <form asp-controller="Wishlist" asp-action="Add" method="post">
+                                        <input type="hidden" name="productId" value="@item.Id" />
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">Wishlist</button>
+                                    </form>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
-    </tbody>
-</table>
+    </div>
+}
