@@ -22,7 +22,7 @@
                 var lifetimeSpend = orders.Sum(o => o.TotalAmount);
                 <div class="card card-lift p-4">
                     <span class="text-secondary text-uppercase small fw-semibold">Lifetime spend</span>
-                    <div class="display-6 fw-bold text-primary">@lifetimeSpend.ToString("C")</div>
+                    <div class="display-6 fw-bold text-primary">@lifetimeSpend.ToString("C", new System.Globalization.CultureInfo("en-IN"))</div>
                 </div>
             }
         </div>

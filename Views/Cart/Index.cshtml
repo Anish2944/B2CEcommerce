@@ -22,7 +22,7 @@
             {
                 <div class="text-md-end">
                     <span class="text-secondary small text-uppercase fw-semibold">Estimated total</span>
-                    <div class="display-6 fw-bold text-primary">@total.ToString("C")</div>
+                    <div class="display-6 fw-bold text-primary">@total.ToString("C", new System.Globalization.CultureInfo("en-IN"))</div>
                 </div>
             }
         </div>
@@ -68,7 +68,7 @@
                                                 <small class="text-secondary">In stock: @product?.Stock</small>
                                             </div>
                                             <div class="text-sm-end">
-                                                <div class="fw-bold text-primary fs-4">@((product?.Price ?? 0M).ToString("C"))</div>
+                                                <div class="fw-bold text-primary fs-4">@((product?.Price ?? 0M).ToString("C", new System.Globalization.CultureInfo("en-IN")))</div>
                                                 <div class="text-secondary">Qty: @item.Quantity</div>
                                             </div>
                                         </div>
@@ -93,15 +93,15 @@
                         <h2 class="h5 fw-bold mb-4">Order summary</h2>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-secondary">Subtotal</span>
-                            <span class="fw-semibold">@subtotal.ToString("C")</span>
+                            <span class="fw-semibold">@subtotal.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-secondary">Shipping estimate</span>
-                            <span class="fw-semibold">@shippingEstimate.ToString("C")</span>
+                            <span class="fw-semibold">@shippingEstimate.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                         </div>
                         <div class="d-flex justify-content-between mb-4">
                             <span class="fw-bold text-uppercase">Total</span>
-                            <span class="fw-bold text-primary">@total.ToString("C")</span>
+                            <span class="fw-bold text-primary">@total.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                         </div>
                         <a asp-controller="Orders" asp-action="Checkout" class="btn btn-primary btn-lg w-100 mb-3">Proceed to checkout</a>
                         <div class="alert alert-soft mb-0" role="alert">
