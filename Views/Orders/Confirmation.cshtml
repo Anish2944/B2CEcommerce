@@ -76,7 +76,7 @@
                                         <div class="fw-semibold">@(item.Product?.Name ?? $"Product #{item.ProductId}")</div>
                                         <small class="text-secondary">Qty: @item.Quantity</small>
                                     </div>
-                                    <div class="fw-semibold">@((item.UnitPrice * item.Quantity).ToString("C"))</div>
+                                    <div class="fw-semibold">@((item.UnitPrice * item.Quantity).ToString("C", new System.Globalization.CultureInfo("en-IN")))</div>
                                 </div>
                             }
                         </div>
@@ -100,15 +100,15 @@
                     <h2 class="h5 fw-bold mb-4">Order summary</h2>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-secondary">Subtotal</span>
-                        <span class="fw-semibold">@subtotal.ToString("C")</span>
+                        <span class="fw-semibold">@subtotal.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
                         <span class="text-secondary">Shipping</span>
-                        <span class="fw-semibold">@shipping.ToString("C")</span>
+                        <span class="fw-semibold">@shipping.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                     </div>
                     <div class="d-flex justify-content-between mb-3">
                         <span class="fw-bold text-uppercase">Total paid</span>
-                        <span class="fw-bold text-primary">@orderTotal.ToString("C")</span>
+                        <span class="fw-bold text-primary">@orderTotal.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                     </div>
                     <hr />
                     <div class="d-flex justify-content-between mb-2">

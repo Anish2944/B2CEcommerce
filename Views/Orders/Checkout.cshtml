@@ -23,7 +23,7 @@
             {
                 <div class="text-md-end">
                     <span class="text-secondary small text-uppercase fw-semibold">Order total</span>
-                    <div class="display-6 fw-bold text-primary">@orderTotal.ToString("C")</div>
+                    <div class="display-6 fw-bold text-primary">@orderTotal.ToString("C", new System.Globalization.CultureInfo("en-IN"))</div>
                 </div>
             }
         </div>
@@ -90,22 +90,22 @@
                                         <div class="fw-semibold">@item.Product?.Name</div>
                                         <small class="text-secondary">Qty: @item.Quantity</small>
                                     </div>
-                                    <div class="fw-semibold">@((item.Product?.Price ?? 0M).ToString("C"))</div>
+                                    <div class="fw-semibold">@((item.Product?.Price ?? 0M).ToString("C", new System.Globalization.CultureInfo("en-IN")))</div>
                                 </div>
                             }
                         </div>
                         <hr class="my-4" />
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-secondary">Subtotal</span>
-                            <span class="fw-semibold">@subtotal.ToString("C")</span>
+                            <span class="fw-semibold">@subtotal.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <span class="text-secondary">Shipping</span>
-                            <span class="fw-semibold">@shipping.ToString("C")</span>
+                            <span class="fw-semibold">@shipping.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span class="fw-bold text-uppercase">Total</span>
-                            <span class="fw-bold text-primary">@orderTotal.ToString("C")</span>
+                            <span class="fw-bold text-primary">@orderTotal.ToString("C", new System.Globalization.CultureInfo("en-IN"))</span>
                         </div>
                         <div class="alert alert-soft mt-4 mb-0" role="alert">
                             <strong>Need help?</strong> Our support team is available 24/7 at <a href="mailto:support@shoply.com" class="link-underline">support@shoply.com</a>.

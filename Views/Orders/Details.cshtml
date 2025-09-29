@@ -73,7 +73,7 @@
                                         <tr class="border-bottom">
                                             <td>
                                                 <div class="fw-semibold">@(item.Product?.Name ?? "Product")</div>
-                                                <div class="small text-secondary">Unit price: @item.UnitPrice.ToString("C")</div>
+                                                <div class="small text-secondary">Unit price: @item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("en-IN"))</div>
                                             </td>
                                             <td class="text-center">@item.Quantity</td>
                                             <td class="text-end fw-semibold">@((item.UnitPrice * @item.Quantity).ToString("C", new System.Globalization.CultureInfo("en-IN")))</td>
