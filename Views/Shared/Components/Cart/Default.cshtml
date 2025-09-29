@@ -1,10 +1,12 @@
-﻿@* @{
-    var count = (int)ViewBag.Count;
+﻿@{
+    var cartCount = (int)ViewBag.Count;
 }
 
-<a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">
-    Cart (@count)
-</a> *@
-<a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">
-    Cart (@((int)ViewBag.Count))
+<a class="nav-link nav-cart-link" asp-controller="Cart" asp-action="Index" title="View cart">
+    <span class="visually-hidden">Cart</span>
+    <i class="bi bi-cart3 fs-5"></i>
+    @if (cartCount > 0)
+    {
+        <span class="cart-count-badge">@cartCount</span>
+    }
 </a>
