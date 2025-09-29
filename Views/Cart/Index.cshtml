@@ -1,44 +1,115 @@
-﻿@model IEnumerable<B2CEcommerceApp.Models.CartItem>
+@model IEnumerable<B2CEcommerceApp.Models.CartItem>
+@using System.Linq
 
 @{
     ViewData["Title"] = "Your Cart";
+    var cartItems = Model ?? Enumerable.Empty<B2CEcommerceApp.Models.CartItem>();
+    var hasItems = cartItems.Any();
+    var subtotal = cartItems.Sum(item => (item.Product?.Price ?? 0M) * item.Quantity);
+    var shippingEstimate = hasItems ? Math.Min(subtotal * 0.05M, 25M) : 0M;
+    var total = subtotal + shippingEstimate;
 }
 
-<h2>Your Cart</h2>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end gap-3 mb-5">
+            <div>
+                <span class="hero-badge">Cart overview</span>
+                <h1 class="section-title mt-3 mb-2">Review your bag</h1>
+                <p class="text-secondary mb-0">Update quantities, move items to wishlist, or head to checkout when you're ready.</p>
+            </div>
+            @if (hasItems)
+            {
+                <div class="text-md-end">
+                    <span class="text-secondary small text-uppercase fw-semibold">Estimated total</span>
+                    <div class="display-6 fw-bold text-primary">@total.ToString("C")</div>
+                </div>
+            }
+        </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Total</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>@item.Product.Name</td>
-            <td>@item.Product.Price</td>
-            <td>@item.Quantity</td>
-            <td>@(item.Product.Price * item.Quantity)</td>
-            <td>
-                <form asp-action="Remove" method="post">
-                    <input type="hidden" name="id" value="@item.Id" />
-                    <button type="submit" class="btn btn-danger btn-sm">Remove</button>
-                </form>
-            </td>
-        </tr>
-    }
-    </tbody>
-</table>
-
-@if (Model.Any())
-{
-    <form asp-controller="Orders" asp-action="Checkout" method="post">
-        <button type="submit" class="btn btn-primary">Checkout</button>
-    </form>
-}
-
+        @if (!hasItems)
+        {
+            <div class="empty-state">
+                <h3 class="fw-semibold mb-2">Your cart is empty</h3>
+                <p class="text-secondary mb-4">Browse our latest arrivals and add products to your cart.</p>
+                <div class="d-flex justify-content-center gap-3 flex-wrap">
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg">Start shopping</a>
+                    <a asp-controller="Wishlist" asp-action="Index" class="btn btn-outline-primary btn-lg">View wishlist</a>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="card card-lift p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="h4 fw-bold mb-0">Cart items (@cartItems.Count())</h2>
+                            <a asp-controller="Products" asp-action="Index" class="btn btn-outline-primary btn-sm">Continue shopping</a>
+                        </div>
+                        <div class="d-flex flex-column gap-4">
+                            @foreach (var item in cartItems)
+                            {
+                                var product = item.Product;
+                                var imageUrl = product?.ImageUrl;
+                                if (string.IsNullOrWhiteSpace(imageUrl))
+                                {
+                                    imageUrl = "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80";
+                                }
+                                <div class="cart-line d-flex flex-column flex-sm-row gap-4 align-items-sm-center">
+                                    <div class="cart-thumb">
+                                        <img src="@imageUrl" alt="@product?.Name" onerror="this.src='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=400&q=80';" />
+                                    </div>
+                                    <div class="flex-grow-1 w-100">
+                                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-3">
+                                            <div>
+                                                <h3 class="h5 fw-semibold mb-1">@product?.Name</h3>
+                                                <p class="text-secondary mb-2">@product?.Description</p>
+                                                <small class="text-secondary">In stock: @product?.Stock</small>
+                                            </div>
+                                            <div class="text-sm-end">
+                                                <div class="fw-bold text-primary fs-4">@((product?.Price ?? 0M).ToString("C"))</div>
+                                                <div class="text-secondary">Qty: @item.Quantity</div>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex flex-wrap gap-3 mt-3">
+                                            <form asp-action="Remove" method="post" class="d-inline">
+                                                <input type="hidden" name="id" value="@item.Id" />
+                                                <button type="submit" class="btn btn-outline-primary btn-sm">Remove</button>
+                                            </form>
+                                            <form asp-controller="Wishlist" asp-action="Add" method="post" class="d-inline">
+                                                <input type="hidden" name="productId" value="@item.ProductId" />
+                                                <button type="submit" class="btn btn-outline-primary btn-sm">Move to wishlist</button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="card card-lift p-4 position-sticky top-0">
+                        <h2 class="h5 fw-bold mb-4">Order summary</h2>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">Subtotal</span>
+                            <span class="fw-semibold">@subtotal.ToString("C")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span class="text-secondary">Shipping estimate</span>
+                            <span class="fw-semibold">@shippingEstimate.ToString("C")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-4">
+                            <span class="fw-bold text-uppercase">Total</span>
+                            <span class="fw-bold text-primary">@total.ToString("C")</span>
+                        </div>
+                        <a asp-controller="Orders" asp-action="Checkout" class="btn btn-primary btn-lg w-100 mb-3">Proceed to checkout</a>
+                        <div class="alert alert-soft mb-0" role="alert">
+                            Enjoy <strong>free shipping</strong> when you spend over $250.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</section>

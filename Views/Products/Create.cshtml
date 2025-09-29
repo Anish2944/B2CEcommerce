@@ -1,58 +1,85 @@
-﻿@model B2CEcommerceApp.Models.Product
+@model B2CEcommerceApp.Models.Product
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create product";
+    var imagePreview = string.IsNullOrWhiteSpace(Model?.ImageUrl)
+        ? "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80"
+        : Model!.ImageUrl;
+    var previewName = string.IsNullOrWhiteSpace(Model?.Name) ? "Your product" : Model!.Name;
 }
 
-<h1>Create</h1>
-
-<h4>Product</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <a asp-action="Index" class="btn btn-outline-primary btn-sm"><i class="bi bi-arrow-left"></i> Back to products</a>
+            <span class="badge-soft">New catalogue entry</span>
+        </div>
+        <div class="row g-4 align-items-start">
+            <div class="col-lg-7">
+                <div class="card card-lift p-4 h-100">
+                    <span class="hero-badge mb-3">Create product</span>
+                    <h1 class="h4 fw-bold mb-2">Add a fresh product to your store</h1>
+                    <p class="text-secondary mb-4">Share compelling details so shoppers know exactly why they'll love it.</p>
+                    <form asp-action="Create" class="row g-4">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="col-12">
+                            <label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+                            <select asp-for="CategoryId" class="form-select form-select-lg" asp-items="ViewBag.CategoryId"></select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Name" class="form-label fw-semibold">Product name</label>
+                            <input asp-for="Name" class="form-control form-control-lg" placeholder="Product title" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Price" class="form-label fw-semibold">Price</label>
+                            <input asp-for="Price" class="form-control form-control-lg" placeholder="0.00" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Description" class="form-label fw-semibold">Description</label>
+                            <textarea asp-for="Description" rows="4" class="form-control" placeholder="Tell customers about the product"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-8">
+                            <label asp-for="ImageUrl" class="form-label fw-semibold">Image URL</label>
+                            <input asp-for="ImageUrl" class="form-control" placeholder="https://" />
+                            <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Stock" class="form-label fw-semibold">Initial stock</label>
+                            <input asp-for="Stock" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger"></span>
+                        </div>
+                        <div class="col-12 d-flex flex-column flex-sm-row gap-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Create product</button>
+                            <a asp-action="Index" class="btn btn-outline-primary btn-lg">Cancel</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+            <div class="col-lg-5">
+                <div class="card card-lift overflow-hidden h-100">
+                    <div class="ratio ratio-4x3 bg-light">
+                        <img src="@imagePreview" alt="@previewName" class="object-fit-cover"
+                             onerror="this.src='https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80';" />
+                    </div>
+                    <div class="card-body">
+                        <h2 class="h5 fw-bold mb-1">Visual merchandising tips</h2>
+                        <p class="text-secondary mb-3">Beautiful photography and concise copy dramatically improve conversion.</p>
+                        <ul class="list-unstyled text-secondary small mb-0">
+                            <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i>Use imagery at least 1200px on the longest side.</li>
+                            <li class="mb-2"><i class="bi bi-check-circle text-primary me-2"></i>Highlight the problem your product solves in the first sentence.</li>
+                            <li><i class="bi bi-check-circle text-primary me-2"></i>Keep stock counts accurate to avoid disappointing shoppers.</li>
+                        </ul>
+                    </div>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Stock" class="control-label"></label>
-                <input asp-for="Stock" class="form-control" />
-                <span asp-validation-for="Stock" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+</section>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

@@ -1,8 +1,143 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@{
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="hero-section position-relative overflow-hidden">
+    <div class="row align-items-center g-5">
+        <div class="col-lg-6">
+            <span class="hero-badge"><i class="bi bi-stars"></i> New season is here</span>
+            <h1 class="display-4 fw-bold mt-3 mb-4">Shop smarter with curated collections tailored for you.</h1>
+            <p class="lead text-secondary mb-4">Discover premium products from trusted brands, get personalized recommendations, and enjoy fast delivery wherever you are.</p>
+            <div class="d-flex flex-wrap gap-3">
+                <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg px-4">Start shopping</a>
+                <a asp-controller="Categories" asp-action="Index" class="btn btn-outline-primary btn-lg px-4">Browse categories</a>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-4 mt-5 text-secondary">
+                <div>
+                    <span class="d-block fs-3 fw-bold text-dark">4.9/5</span>
+                    <small>Customer satisfaction</small>
+                </div>
+                <div>
+                    <span class="d-block fs-3 fw-bold text-dark">48h</span>
+                    <small>Average delivery time</small>
+                </div>
+                <div>
+                    <span class="d-block fs-3 fw-bold text-dark">500+</span>
+                    <small>Handpicked products</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="position-relative">
+                <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=900&q=80" class="img-fluid rounded-4 shadow-lg" alt="Shopping experience illustration">
+                <div class="card card-lift p-3 position-absolute bottom-0 end-0 me-lg-5 mb-lg-5 mb-3 me-3" style="max-width: 260px;">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="feature-icon"><i class="bi bi-bag-check"></i></div>
+                        <div>
+                            <p class="mb-1 fw-semibold">Seamless checkout</p>
+                            <small class="text-secondary">Enjoy one-click repeat orders and secure payments.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h2 class="section-title mb-0">Why shoppers love us</h2>
+        <a asp-controller="Products" asp-action="Index" class="text-decoration-none fw-semibold text-primary">Explore our catalog <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card-lift p-4 h-100">
+                <div class="feature-icon mb-3"><i class="bi bi-truck"></i></div>
+                <h5 class="fw-semibold">Fast, tracked delivery</h5>
+                <p class="text-secondary mb-0">Every order is shipped with real-time tracking, allowing you to follow your package from warehouse to doorstep.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-lift p-4 h-100">
+                <div class="feature-icon mb-3"><i class="bi bi-shield-lock"></i></div>
+                <h5 class="fw-semibold">Secure checkout</h5>
+                <p class="text-secondary mb-0">Encrypted payments and two-factor authentication keep your personal details safe across every transaction.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card-lift p-4 h-100">
+                <div class="feature-icon mb-3"><i class="bi bi-gift"></i></div>
+                <h5 class="fw-semibold">Rewards on repeat</h5>
+                <p class="text-secondary mb-0">Earn loyalty points with every purchase and redeem them for exclusive discounts and early product access.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4">
+        <h2 class="section-title mb-0">Featured categories</h2>
+        <a asp-controller="Categories" asp-action="Index" class="text-decoration-none fw-semibold text-primary">View all categories <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card card-lift h-100 p-4">
+                <span class="badge-soft mb-3">New arrivals</span>
+                <h5 class="fw-semibold mb-2">Smart gadgets</h5>
+                <p class="text-secondary">Upgrade your workspace and lifestyle with innovative tech designed for modern living.</p>
+                <a asp-controller="Products" asp-action="Index" asp-route-categoryId="1" class="fw-semibold text-primary text-decoration-none">Shop gadgets <i class="bi bi-arrow-up-right"></i></a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-lift h-100 p-4">
+                <span class="badge-soft mb-3">Most loved</span>
+                <h5 class="fw-semibold mb-2">Home essentials</h5>
+                <p class="text-secondary">Refresh your space with curated decor and everyday essentials that blend style and function.</p>
+                <a asp-controller="Products" asp-action="Index" asp-route-categoryId="2" class="fw-semibold text-primary text-decoration-none">Update your home <i class="bi bi-arrow-up-right"></i></a>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card card-lift h-100 p-4">
+                <span class="badge-soft mb-3">Limited time</span>
+                <h5 class="fw-semibold mb-2">Fitness &amp; wellness</h5>
+                <p class="text-secondary">Stay active with gear that keeps up with your goals, from yoga mats to smart wearables.</p>
+                <a asp-controller="Products" asp-action="Index" asp-route-categoryId="3" class="fw-semibold text-primary text-decoration-none">Elevate your routine <i class="bi bi-arrow-up-right"></i></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="mt-5">
+    <div class="row g-4 align-items-center">
+        <div class="col-lg-5">
+            <h2 class="section-title">Designed for a seamless experience</h2>
+            <p class="text-secondary">Track orders, manage wishlists, and stay synced across every device. Our responsive storefront keeps your shopping effortless whether you are at home or on the move.</p>
+            <div class="d-flex flex-column gap-3 mt-4">
+                <div class="d-flex gap-3 align-items-start">
+                    <div class="feature-icon flex-shrink-0"><i class="bi bi-phone"></i></div>
+                    <div>
+                        <h6 class="fw-semibold mb-1">Mobile-first design</h6>
+                        <small class="text-secondary">Optimized layouts ensure fast browsing and checkout on smartphones and tablets.</small>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 align-items-start">
+                    <div class="feature-icon flex-shrink-0"><i class="bi bi-people"></i></div>
+                    <div>
+                        <h6 class="fw-semibold mb-1">Personalized for you</h6>
+                        <small class="text-secondary">Sign in to sync wishlists, save addresses, and receive curated product ideas.</small>
+                    </div>
+                </div>
+                <div class="d-flex gap-3 align-items-start">
+                    <div class="feature-icon flex-shrink-0"><i class="bi bi-lightning-charge"></i></div>
+                    <div>
+                        <h6 class="fw-semibold mb-1">Instant updates</h6>
+                        <small class="text-secondary">Get notified about price drops, restocks, and exclusive releases in real time.</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-7">
+            <img src="https://images.unsplash.com/photo-1523475472560-d2df97ec485c?auto=format&fit=crop&w=1200&q=80" class="img-fluid rounded-4 shadow-lg" alt="Responsive ecommerce screens">
+        </div>
+    </div>
+</section>

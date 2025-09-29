@@ -1,72 +1,120 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - B2CEcommerceApp</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - B2C Commerce</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" crossorigin="anonymous">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/B2CEcommerceApp.styles.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">B2CEcommerceApp</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+<body class="bg-soft">
+    <header class="mb-4">
+        <div class="top-strip text-center text-white py-1 small">
+            <span class="me-3"><i class="bi bi-truck"></i> Free shipping on orders over $50</span>
+            <span class="me-3"><i class="bi bi-shield-check"></i> Secure payments</span>
+            <span><i class="bi bi-headset"></i> 24/7 support</span>
+        </div>
+        <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+            <div class="container">
+                <a class="navbar-brand fw-bold text-primary" asp-area="" asp-controller="Home" asp-action="Index">B2C Commerce</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
+                <div class="collapse navbar-collapse" id="mainNavbar">
+                    <ul class="navbar-nav me-auto align-items-lg-center gap-lg-2">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link" asp-area="" asp-controller="Products" asp-action="Index">Shop</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Products" asp-action="Index">Products</a>
+                            <a class="nav-link" asp-area="" asp-controller="Categories" asp-action="Index">Categories</a>
                         </li>
-                    </ul>
-                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
                         @if (User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Orders" asp-action="Manage">Manage Orders</a>
+                                <a class="nav-link" asp-controller="Orders" asp-action="Manage">Manage Orders</a>
                             </li>
                         }
-                        else if (User.Identity != null && User.Identity.IsAuthenticated)
+                    </ul>
+                    <form class="d-flex me-lg-4 mt-3 mt-lg-0 flex-grow-1" asp-controller="Products" asp-action="Index" method="get">
+                        <div class="input-group search-bar flex-grow-1">
+                            <span class="input-group-text bg-transparent border-end-0"><i class="bi bi-search"></i></span>
+                            <input class="form-control border-start-0" type="search" placeholder="Search products" aria-label="Search products" name="searchString" value="@Context.Request.Query["searchString"]">
+                        </div>
+                    </form>
+                    <ul class="navbar-nav ms-lg-4 align-items-lg-center gap-lg-2">
+                        @if (User.Identity != null && User.Identity.IsAuthenticated && !User.IsInRole("Admin"))
                         {
                             <li class="nav-item">
                                 @await Component.InvokeAsync("Cart")
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Wishlist" asp-action="Index">Wishlist</a>
+                                <a class="nav-link" asp-controller="Wishlist" asp-action="Index"><i class="bi bi-heart me-1"></i>Wishlist</a>
                             </li>
                         }
-
-                        <li class="nav-item">
+                        <li class="nav-item dropdown">
                             <partial name="_LoginPartial" />
                         </li>
                     </ul>
-
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+
+    <div class="container pb-5">
+        <main role="main" class="pb-5">
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - B2CEcommerceApp - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <footer class="footer-gradient text-white mt-auto">
+        <div class="container py-4">
+            <div class="row g-4 align-items-center">
+                <div class="col-md-6">
+                    <h5 class="fw-semibold">Stay in the loop</h5>
+                    <p class="mb-3">Subscribe to receive product updates, exclusive deals, and more.</p>
+                    <form class="row g-2" action="#" method="post">
+                        <div class="col-sm-8">
+                            <input type="email" class="form-control form-control-lg" placeholder="Enter your email" required />
+                        </div>
+                        <div class="col-sm-4">
+                            <button type="submit" class="btn btn-light btn-lg w-100">Subscribe</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-uppercase fw-semibold">Company</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li><a class="footer-link" asp-controller="Home" asp-action="Index">About us</a></li>
+                        <li><a class="footer-link" asp-controller="Home" asp-action="Privacy">Privacy policy</a></li>
+                        <li><a class="footer-link" asp-controller="Home" asp-action="Privacy">Terms &amp; conditions</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="text-uppercase fw-semibold">Support</h6>
+                    <ul class="list-unstyled small mb-0">
+                        <li><span class="footer-link"><i class="bi bi-envelope me-2"></i>support@b2ccommerce.com</span></li>
+                        <li><span class="footer-link"><i class="bi bi-telephone me-2"></i>+1 (555) 123-4567</span></li>
+                        <li><span class="footer-link"><i class="bi bi-geo-alt me-2"></i>Global HQ, Remote</span></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="text-center small text-white-50 mt-4">
+                &copy; @DateTime.UtcNow.Year B2C Commerce. All rights reserved.
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

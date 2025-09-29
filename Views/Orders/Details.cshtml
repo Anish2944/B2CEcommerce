@@ -1,27 +1,102 @@
-﻿@model B2CEcommerceApp.Models.Order
+@model B2CEcommerceApp.Models.Order
 
-<h2>Order Details</h2>
-<p><strong>Order Date:</strong> @Model.OrderDate</p>
-<p><strong>Total:</strong> @Model.TotalAmount</p>
+@{
+    ViewData["Title"] = $"Order #{Model.Id}";
+    var isAdmin = User.IsInRole("Admin");
+    var products = Model.OrderItems != null
+        ? new System.Collections.Generic.List<B2CEcommerceApp.Models.OrderItem>(Model.OrderItems)
+        : new System.Collections.Generic.List<B2CEcommerceApp.Models.OrderItem>();
+    var itemsCount = 0;
+    foreach (var product in products)
+    {
+        itemsCount += product.Quantity;
+    }
+}
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Product</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Subtotal</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.OrderItems)
-        {
-            <tr>
-                <td>@(item.Product?.Name ?? "N/A")</td>
-                <td>@item.UnitPrice</td>
-                <td>@item.Quantity</td>
-                <td>@(item.UnitPrice * item.Quantity)</td>
-            </tr>
-        }
-    </tbody>
-</table>
+<section class="page-section">
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+            <div>
+                <span class="hero-badge">Order details</span>
+                <h1 class="section-title mt-3 mb-0">Order #@Model.Id</h1>
+                <p class="text-secondary mb-0">Placed on @Model.OrderDate.ToString("dddd, MMMM dd, yyyy")</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <span class="badge-soft text-capitalize">@Model.Status</span>
+                <span class="badge-soft">@itemsCount item(s)</span>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+                <div class="card card-lift p-4 h-100">
+                    <span class="text-secondary text-uppercase small fw-semibold">Summary</span>
+                    <div class="display-6 fw-bold text-primary mt-2 mb-3">@Model.TotalAmount.ToString("C")</div>
+                    <ul class="list-unstyled text-secondary small mb-0">
+                        <li class="d-flex align-items-start gap-2 mb-2">
+                            <i class="bi bi-calendar-event text-primary mt-1"></i>
+                            <span>Order placed on <strong>@Model.OrderDate.ToString("MMM dd, yyyy")</strong></span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2 mb-2">
+                            <i class="bi bi-credit-card text-primary mt-1"></i>
+                            <span>Payment method: <strong>@(string.IsNullOrWhiteSpace(Model.PaymentMethod) ? "Cash on Delivery" : Model.PaymentMethod)</strong></span>
+                        </li>
+                        <li class="d-flex align-items-start gap-2">
+                            <i class="bi bi-telephone text-primary mt-1"></i>
+                            <span>Contact: <strong>@(string.IsNullOrWhiteSpace(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</strong></span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-lg-8">
+                <div class="card card-lift p-4 h-100">
+                    <h2 class="h5 fw-bold mb-3">Shipping address</h2>
+                    <p class="text-secondary mb-4">
+                        @(string.IsNullOrWhiteSpace(Model.ShippingAddress)
+                            ? "Shipping address will be collected during fulfillment."
+                            : Model.ShippingAddress)
+                    </p>
+                    <div class="border-top pt-3">
+                        <h2 class="h5 fw-bold mb-3">Items in this order</h2>
+                        <div class="table-responsive">
+                            <table class="table table-borderless align-middle mb-0">
+                                <thead class="bg-light text-secondary text-uppercase small fw-semibold">
+                                    <tr>
+                                        <th scope="col">Product</th>
+                                        <th scope="col" class="text-center">Qty</th>
+                                        <th scope="col" class="text-end">Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white">
+                                    @foreach (var item in products)
+                                    {
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="fw-semibold">@(item.Product?.Name ?? "Product")</div>
+                                                <div class="small text-secondary">Unit price: @item.UnitPrice.ToString("C")</div>
+                                            </td>
+                                            <td class="text-center">@item.Quantity</td>
+                                            <td class="text-end fw-semibold">@(item.UnitPrice * item.Quantity).ToString("C")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex flex-wrap gap-3">
+            @if (isAdmin)
+            {
+                <a asp-action="Manage" class="btn btn-outline-primary btn-lg"><i class="bi bi-arrow-left"></i> Back to manage orders</a>
+            }
+            else
+            {
+                <a asp-action="Index" class="btn btn-outline-primary btn-lg"><i class="bi bi-arrow-left"></i> Back to my orders</a>
+            }
+            <a asp-controller="Products" asp-action="Index" class="btn btn-primary btn-lg">Continue shopping</a>
+        </div>
+    </div>
+</section>
